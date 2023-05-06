@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const { ObjectId } = mongoose.Schema
 
+// Create an user schema for our database
 const userSchema = new mongoose.Schema(
   {
     name: String,
