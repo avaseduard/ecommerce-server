@@ -6,7 +6,7 @@ exports.createOrUpdateUser = async (req, res) => {
   // Find an existing user by email property (first argument), update picture and name (second argument); return the updated user document in the user variable (third argument)
   const user = await User.findOneAndUpdate(
     { email: email },
-    { name: name, picture: picture },
+    { name: email.split('@')[0], picture: picture },
     { new: true }
   )
   // If the user exists send the response; if not, create a new user using the constructor, save it in db and send the response
@@ -15,8 +15,8 @@ exports.createOrUpdateUser = async (req, res) => {
     res.json(user)
   } else {
     const newUser = await new User({
-      name: name,
       email: email,
+      name: email.split('@')[0],
       picture: picture,
     }).save()
     res.json(newUser)

@@ -23,6 +23,5 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 )
-console.log('whatever')
 
 module.exports = mongoose.model('User', userSchema)
