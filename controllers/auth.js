@@ -23,3 +23,11 @@ exports.createOrUpdateUser = async (req, res) => {
     console.log('USER CREATED', newUser)
   }
 }
+
+// Find the user based on the e-mail we have in req.user; execute the action of sending the user, if available in db
+exports.currentUser = (req, res) => {
+  User.findOne({email: req.user.email}).exec((err, user) => {
+    if (err) throw new Error(err)
+    res.json(user)
+  })
+}
