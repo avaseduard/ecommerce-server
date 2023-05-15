@@ -13,23 +13,44 @@ exports.create = async (req, res) => {
     // Send the response
     res.json(category)
   } catch (error) {
-    console.log(error)
-    req.status(400).send('Create category failed')
+    // console.log(error)
+    res.status(400).send('Create category failed')
   }
 }
 
-exports.list = async (req, res) => {
-  //
-}
+// Find all created categories and sort them by newest to latest
+exports.list = async (req, res) =>
+  res.json(await Category.find({}).sort({ createdAt: -1 }).exec())
 
+// Find one category by slug name, which we get form params (the last part of the endpoint '/category/:slug')
 exports.read = async (req, res) => {
-  //
+  let category = await Category.findOne({ slug: req.params.slug }).exec()
+  res.json(category)
 }
 
 exports.update = async (req, res) => {
-  //
+  const { name } = req.body
+  try {
+    // Get the category name from frontend
+    // Find the category in db by slug and update the name and slug with the one we get from front end (new: true sends the category after updating)
+    const updated = await Category.findOneAndUpdate(
+      { slug: req.params.slug },
+      { name: name, slug: slugify(name) },
+      { new: true }
+    )
+    res.json(updated)
+  } catch (error) {
+    // console.log(error)
+    req.status(400).send('Update category failed')
+  }
 }
 
 exports.remove = async (req, res) => {
-  //
+  try {
+    const deleted = await Category.findOneAndDelete({ slug: req.params.slug })
+    res.json(deleted)
+  } catch (error) {
+    // console.log(error)
+    req.status(400).send('Delete category failed')
+  }
 }
