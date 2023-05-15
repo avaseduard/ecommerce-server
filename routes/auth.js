@@ -1,13 +1,13 @@
 const express = require('express')
-
 const router = express.Router()
 
-// middlewares - check the token
+// Middlewares - check the token and check for admin role
 const { authCheck, adminCheck } = require('../middlewares/auth')
 
-// import controller which we use below as an argument in router.post
+// Import controllers which we use below as arguments in router actions
 const { createOrUpdateUser, currentUser } = require('../controllers/auth')
 
+// Routes (endpoints)
 router.post('/create-or-update-user', authCheck, createOrUpdateUser)
 router.post('/current-user', authCheck, currentUser)
 router.post('/current-admin', authCheck, adminCheck, currentUser)
