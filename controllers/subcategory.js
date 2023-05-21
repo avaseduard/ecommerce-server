@@ -4,16 +4,17 @@ const slugify = require('slugify')
 exports.create = async (req, res) => {
   try {
     // Get the category name from frontend
-    const { name } = req.body
+    const { name, parent } = req.body
     // Create the new category in db using the model
     const subcategory = await new Subcategory({
       name: name,
+      parent: parent,
       slug: slugify(name),
     }).save()
     // Send the response
     res.json(subcategory)
   } catch (error) {
-    // console.log(error)
+    console.log('SUB CREATE FAILED --->', error)
     res.status(400).send('Create subcategory failed')
   }
 }
@@ -29,13 +30,13 @@ exports.read = async (req, res) => {
 }
 
 exports.update = async (req, res) => {
-  const { name } = req.body
+  const { name, parent } = req.body
   try {
     // Get the category name from frontend
     // Find the category in db by slug and update the name and slug with the one we get from front end (new: true sends the category after updating)
     const updated = await Subcategory.findOneAndUpdate(
       { slug: req.params.slug },
-      { name: name, slug: slugify(name) },
+      { name: name, parent: parent, slug: slugify(name) },
       { new: true }
     )
     res.json(updated)
@@ -47,7 +48,9 @@ exports.update = async (req, res) => {
 
 exports.remove = async (req, res) => {
   try {
-    const deleted = await Subcategory.findOneAndDelete({ slug: req.params.slug })
+    const deleted = await Subcategory.findOneAndDelete({
+      slug: req.params.slug,
+    })
     res.json(deleted)
   } catch (error) {
     // console.log(error)
