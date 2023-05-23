@@ -12,6 +12,11 @@ exports.create = async (req, res) => {
     res.json(newProduct)
   } catch (error) {
     console.log(error)
-    res.status(400).send('Create product failed')
+    res.status(400).json({
+      error: error.message,
+    })
   }
 }
+
+// Find all created products and sort them by newest to latest
+exports.read = async (req, res) => res.json(await Product.find({}))

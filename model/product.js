@@ -16,7 +16,7 @@ const productSchema = new mongoose.Schema(
       lowercase: true,
       index: true,
     },
-    desciption: {
+    description: {
       type: String,
       required: true,
       maxlength: 2000,
@@ -43,9 +43,9 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    images: {
-      type: Array,
-    },
+    // images: {
+    //   type: Array,
+    // },
     shipping: {
       type: String,
       enum: ['Yes', 'No'], // enum means it has to be either one of these two values
