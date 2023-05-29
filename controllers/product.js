@@ -19,4 +19,12 @@ exports.create = async (req, res) => {
 }
 
 // Find all created products and sort them by newest to latest
-exports.read = async (req, res) => res.json(await Product.find({}))
+exports.listAll = async (req, res) => {
+  let products = await Product.find({})
+    .limit(parseInt(req.params.count))
+    .populate('category')
+    .populate('subcategories')
+    .sort([['createdAt', 'desc']])
+    .exec()
+  res.json(products)
+}
