@@ -3,7 +3,6 @@ const slugify = require('slugify')
 
 exports.create = async (req, res) => {
   try {
-    console.log(req.body)
     // Set the slub to req body, by slugifying the title (the slug is not coming from front end)
     req.body.slug = slugify(req.body.title)
     // Save the new product in database
@@ -11,7 +10,7 @@ exports.create = async (req, res) => {
     // Send the response
     res.json(newProduct)
   } catch (error) {
-    console.log(error)
+    console.log('PRODUCT UPDATE FAILED -->', error)
     res.status(400).json({
       error: error.message,
     })
@@ -49,4 +48,24 @@ exports.read = async (req, res) => {
     .populate('subcategories')
     .exec()
   res.json(product)
+}
+
+exports.update = async (req, res) => {
+  try {
+    // If we have a new title coming from front end, set the slug to req body
+    if (req.body.title) req.body.slug = slugify(req.body.title)
+    // Update the product in database
+    const updated = await Product.findOneAndUpdate(
+      { slug: req.params.slug }, // query db by slug
+      req.body, // update with what we get from front end body
+      { new: true } // return updated version of product from db
+    ).exec()
+    // Send the response with updated product
+    res.json(updated)
+  } catch (error) {
+    console.log('PRODUCT UPDATE FAILED -->', error)
+    res.status(400).json({
+      error: error.message,
+    })
+  }
 }
