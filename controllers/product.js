@@ -69,3 +69,22 @@ exports.update = async (req, res) => {
     })
   }
 }
+
+// To list new arrivals and best sellers on home page
+exports.list = async (req, res) => {
+  try {
+    //  
+    const { sort, order, limit } = req.body // createdAt/ updatedAt, asc/ desc, 3
+    //  Find products and filter products in database that match our criteria
+    const products = await Product.find({})
+      .populate('category')
+      .populate('subcategories')
+      .sort([[sort, order]])
+      .limit(limit)
+      .exec()
+    // Send found products to front end
+    res.json(products)
+  } catch (error) {
+    console.log('LIST NEW ARRIVALS OR BEST SELLERS FAILED -->', error)
+  }
+}
