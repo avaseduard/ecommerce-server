@@ -73,8 +73,8 @@ exports.update = async (req, res) => {
 // To list new arrivals and best sellers on home page
 exports.list = async (req, res) => {
   try {
-    //  
-    const { sort, order, limit } = req.body // createdAt/ updatedAt, asc/ desc, 3
+    // Destructure the sort, order and limit that we receive from front end
+    const { sort, order, limit } = req.body // {createdAt/ updatedAt, asc/ desc, 3/ 5/ 10}
     //  Find products and filter products in database that match our criteria
     const products = await Product.find({})
       .populate('category')
@@ -87,4 +87,12 @@ exports.list = async (req, res) => {
   } catch (error) {
     console.log('LIST NEW ARRIVALS OR BEST SELLERS FAILED -->', error)
   }
+}
+
+// To get the numbers of products from db for pagination
+exports.productsCount = async (req, res) => {
+  // let total = await Product.find({}).estimatedDocumentCount().exec()
+  let total = await Product.count()
+
+  res.json(total)
 }
