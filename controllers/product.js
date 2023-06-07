@@ -74,13 +74,16 @@ exports.update = async (req, res) => {
 exports.list = async (req, res) => {
   try {
     // Destructure the sort, order and limit that we receive from front end
-    const { sort, order, limit } = req.body // {createdAt/ updatedAt, asc/ desc, 3/ 5/ 10}
-    //  Find products and filter products in database that match our criteria
+    const { sort, order, page } = req.body // {createdAt/ updatedAt, asc/ desc, 3/ 5/ 10}
+    const currentPage = page || 1
+    const perPage = 3
+    // Get products from db based on the page no. from frontend and no. of items per page
     const products = await Product.find({})
+      .skip((currentPage - 1) * perPage)
       .populate('category')
       .populate('subcategories')
       .sort([[sort, order]])
-      .limit(limit)
+      .limit(perPage)
       .exec()
     // Send found products to front end
     res.json(products)
@@ -93,6 +96,5 @@ exports.list = async (req, res) => {
 exports.productsCount = async (req, res) => {
   // let total = await Product.find({}).estimatedDocumentCount().exec()
   let total = await Product.count()
-
   res.json(total)
 }
