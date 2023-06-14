@@ -1,4 +1,5 @@
 const Product = require('../model/product')
+const User = require('../model/user')
 const slugify = require('slugify')
 
 exports.create = async (req, res) => {
@@ -97,4 +98,45 @@ exports.productsCount = async (req, res) => {
   // let total = await Product.find({}).estimatedDocumentCount().exec()
   let total = await Product.count()
   res.json(total)
+}
+
+//
+exports.productStar = async (req, res) => {
+  const product = await Product.findById(req.params.productId).exec()
+  const user = await User.findOne({ email: req.user.email }).exec()
+  const { star } = req.body
+  // Check if the user has already left rating for this product
+  const existingObjectRating = product.ratings.find(
+    element => element.postedBy.toString() === user._id.toString()
+  ) // return either undefined or the rating object
+  // If the user hasn't left a rating yet, find the product in db by id and push the rating (with star and user id) to the product's rating db array
+  if (existingObjectRating === undefined) {
+    const ratingAdded = Product.findByIdAndUpdate(
+      product._id,
+      {
+        $push: {
+          ratings: {
+            star: star,
+            postedBy: user._id,
+          },
+        },
+      },
+      { new: true }
+    ).exec()
+    console.log('RATING ADDED -->', ratingAdded)
+    res.json(ratingAdded)
+  } else {
+    // If the user has already left a rating for the product in db, search the rating object by the existingObjectRating we have from front end and update it with the star we get from front end
+    const updatedRating = await Product.updateOne(
+      {
+        ratings: {
+          $elemMatch: existingObjectRating,
+        },
+      },
+      { $set: { 'ratings.$.star': star } },
+      { new: true }
+    ).exec()
+    console.log('RATING UPDATED -->', updatedRating)
+    res.json(updatedRating)
+  }
 }
