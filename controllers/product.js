@@ -140,3 +140,20 @@ exports.productStar = async (req, res) => {
     res.json(updatedRating)
   }
 }
+
+exports.listRelated = async (req, res) => {
+  // Find product based on id sent from front end
+  const product = await Product.findById(req.params.productId).exec()
+  // Find related products (same category), excluding the above one
+  const related = await Product.find({
+    _id: { $ne: product._id },
+    category: product.category,
+  })
+    .limit(3)
+    .populate('category')
+    .populate('subcategories')
+    .populate('postedBy')
+    .exec()
+
+  res.json(related)
+}
