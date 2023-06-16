@@ -1,4 +1,5 @@
 const Subcategory = require('../model/subcategory')
+const Product = require('../model/product')
 const slugify = require('slugify')
 
 exports.create = async (req, res) => {
@@ -25,8 +26,15 @@ exports.list = async (req, res) =>
 
 // Find one category by slug name, which we get form params (the last part of the endpoint '/category/:slug')
 exports.read = async (req, res) => {
-  let subcategory = await Subcategory.findOne({ slug: req.params.slug }).exec()
-  res.json(subcategory)
+  const subcategory = await Subcategory.findOne({ slug: req.params.slug }).exec()
+  const products = await Product.find({ subcategories: subcategory })
+    .populate('category')
+    .exec()
+
+  res.json({
+    subcategory: subcategory,
+    products: products,
+  })
 }
 
 exports.update = async (req, res) => {
