@@ -157,3 +157,79 @@ exports.listRelated = async (req, res) => {
 
   res.json(related)
 }
+
+// Search & filter
+
+// Query the db based on the text property (which is true in the model, for title and description)
+const handleQuery = async (req, res, query) => {
+  // const products = await Product.find({ $text: { $search: query } })
+  const products = await Product.find({
+    title: {
+      $regex: query,
+      $options: 'i',
+    },
+    description: {
+      $regex: query,
+      $options: 'i',
+    },
+  })
+    .populate('category', '_id name')
+    .populate('subcategories', '_id name')
+    .populate('postedBy', '_id name')
+    .exec()
+
+  res.json(products)
+}
+
+// Query the db based on price array that we get from fe (ie [10, 100])
+const handlePrice = async (req, res, price) => {
+  try {
+    const products = await Product.find({
+      price: {
+        $gte: price[0],
+        $lte: price[1],
+      },
+    })
+      .populate('category', '_id name')
+      .populate('subcategories', '_id name')
+      .populate('postedBy', '_id name')
+      .exec()
+
+    res.json(products)
+  } catch (error) {
+    console.log('PRICE FILTER BE ERROR -->', error)
+  }
+}
+
+const handleCategory = async (req, res, category) => {
+  try {
+    const products = await Product.find({ category })
+      .populate('category', '_id name')
+      .populate('subcategories', '_id name')
+      .populate('postedBy', '_id name')
+      .exec()
+
+    res.json(products)
+  } catch (error) {
+    console.log('CATEGORY FILTER BE ERROR -->', error)
+  }
+}
+
+exports.searchFilters = async (req, res) => {
+  const { query, price, category } = req.body
+
+  if (query) {
+    console.log('QUERY FILTER BE -->', query)
+    await handleQuery(req, res, query)
+  }
+
+  if (price !== undefined) {
+    console.log('PRICE FILTER BE -->', price)
+    await handlePrice(req, res, price)
+  }
+
+  if (category) {
+    console.log('CATEGORY FILTER BE -->', category)
+    await handleCategory(req, res, category)
+  }
+}
