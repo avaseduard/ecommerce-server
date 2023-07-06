@@ -15,7 +15,7 @@ const {
   productsCount,
   productStar,
   listRelated,
-  searchFilters
+  searchFilters,
 } = require('../controllers/product')
 
 // Routes (endpoints)
